@@ -63,8 +63,6 @@ extension NilSafe {
 
     fileprivate func getValue(_ value: Any) -> Any? {
         if let first = Mirror(reflecting: value).children.first {
-            print(first.value)
-            print(type(of: first.value))
             return first.value
         } else {
             return nil
