@@ -36,7 +36,7 @@ enum AccountType {
 
 class NilSafeTests: XCTestCase {
 
-    func testValid_1() {
+    func testValid() {
         let discount = Discount()
         discount.amount = 5
         discount.text = "Hello"
