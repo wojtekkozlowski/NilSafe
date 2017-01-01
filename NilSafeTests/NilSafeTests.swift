@@ -159,7 +159,7 @@ class NilSafeTests: XCTestCase {
         XCTAssertFalse(user.isNilSafe())
     }
 
-    func testArrayValid_1() {
+    func testArrayValid() {
 
         class B: NilSafe {
             var c: String!
