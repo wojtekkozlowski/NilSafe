@@ -9,26 +9,31 @@
 import XCTest
 @testable import NilSafe
 
+extension User: NilSafe {}
+extension Account: NilSafe {}
+extension Discount: NilSafe {}
 
-class User: NilSafe {
+class User {
     var name: String!
     var account: Account!
+    var alias: String?
+}
+
+class Account {
+    var amount: Int!
+    var discount: Discount?
+    var accountType: AccountType!
+}
+
+class Discount {
+    var amount: Int!
+    var text: String!
 }
 
 enum AccountType {
     case limited, full
 }
 
-class Account: NilSafe {
-    var amount: Int!
-    var discount: Discount?
-    var accountType: AccountType!
-}
-
-class Discount: NilSafe {
-    var amount: Int!
-    var text: String!
-}
 
 class NilSafeTests: XCTestCase {
     
