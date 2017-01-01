@@ -16,7 +16,7 @@ public extension NilSafe {
     public func isNilSafe() -> Bool {
         let children = Mirror(reflecting: self).children
 
-        return children.reduce(true) { acc, child -> Bool in
+        return children.reduce(true) { acc, child in
             let result: Bool
 
             switch OptionalType(child.value) {
@@ -42,12 +42,14 @@ public extension NilSafe {
 
 extension NilSafe {
     fileprivate func checkArray(_ array: Array<Any>) -> Bool {
-        return array.reduce(true) { acc, child -> Bool in
+        return array.reduce(true) { acc, child in
+            let result: Bool
             if let nilSafeChild = child as? NilSafe {
-                return acc && nilSafeChild.isNilSafe()
+                result = nilSafeChild.isNilSafe()
             } else {
-                return acc && true
+                result = true
             }
+            return acc && result
         }
     }
 
