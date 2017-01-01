@@ -189,19 +189,17 @@ class NilSafeTests: XCTestCase {
 
         XCTAssertFalse(a.isNilSafe())
     }
-    
+
     func testArrayValid_empty_array() {
-        
+
         class B: NilSafe { var c: String! }
         class A: NilSafe { var bs: [B]! }
-        
+
         let a = A()
         a.bs = []
-        
+
         XCTAssertTrue(a.isNilSafe())
     }
-    
-    
 
     func testArrayValid_Optional() {
 
@@ -222,5 +220,35 @@ class NilSafeTests: XCTestCase {
         a.bs = [B()]
 
         XCTAssertFalse(a.isNilSafe())
+    }
+
+    func testArray_Optional_But_Nasted_Element_has_nil_property() {
+
+        class C: NilSafe { var c: String! }
+        class B: NilSafe { var cs: [C]! }
+        class A: NilSafe { var bs: [B]? }
+
+        let a = A()
+        let b = B()
+        b.cs = [C()]
+        a.bs = [b]
+
+        XCTAssertFalse(a.isNilSafe())
+    }
+
+    func testArray_Optional_Nasted_Elements() {
+
+        class C: NilSafe { var str: String! }
+        class B: NilSafe { var cs: [C]! }
+        class A: NilSafe { var bs: [B]? }
+
+        let a = A()
+        let b = B()
+        let c = C()
+        c.str = "required"
+        b.cs = [c]
+        a.bs = [b]
+
+        XCTAssertTrue(a.isNilSafe())
     }
 }
