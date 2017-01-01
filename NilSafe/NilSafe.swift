@@ -12,45 +12,28 @@ public protocol NilSafe {
     func isNilSafe() -> Bool
 }
 
-enum OptionalType {
-    case implicitlyUnwrappedOptional
-    case optional
-    case other
-    
-    init(_ value: Any){
-        let typeDescription = "\(type(of: value))"
-        if typeDescription.hasPrefix("ImplicitlyUnwrappedOptional<") {
-            self = .implicitlyUnwrappedOptional
-        } else if typeDescription.hasPrefix("Optional<"){
-            self = .optional
-        } else {
-            self = .optional
-        }
-    }
-}
-
 public extension NilSafe {
     public func isNilSafe() -> Bool {
         let children = Mirror(reflecting: self).children
-        var messages = [String]()
+
         return children.reduce(true) { acc, child -> Bool in
-            let res: Bool
-            
+            let result: Bool
+
             switch OptionalType(child.value) {
             case .optional:
-                res = checkOptionalValueOrSucceed(child.value)
+                result = checkOptionalValueOrSucceed(child.value)
             case .implicitlyUnwrappedOptional:
-                let valid = hasValue(child.value)
-                if valid {
-                    res = checkOptionalValueOrSucceed(child.value)
+                if hasValue(child.value) {
+                    result = checkOptionalValueOrSucceed(child.value)
                 } else {
-                    messages.append("property '\(self).\(child.label!)' cannot be nil")
-                    res = false
+                    NSLog("NilSafe error: property '\(self).\(child.label!)' cannot be nil")
+                    result = false
                 }
             case .other:
-                res = true
+                result = true
             }
-            return acc && res
+
+            return acc && result
         }
     }
 }
@@ -63,7 +46,7 @@ extension NilSafe {
             return true
         }
     }
-    
+
     fileprivate func getValue(_ value: Any) -> Any? {
         if let first = Mirror(reflecting: value).children.first {
             return first.value
@@ -71,9 +54,25 @@ extension NilSafe {
             return nil
         }
     }
-    
+
     fileprivate func hasValue(_ value: Any) -> Bool {
         return getValue(value) != nil
     }
 }
 
+fileprivate enum OptionalType {
+    case implicitlyUnwrappedOptional
+    case optional
+    case other
+
+    init(_ value: Any) {
+        let typeDescription = "\(type(of: value))"
+        if typeDescription.hasPrefix("ImplicitlyUnwrappedOptional<") {
+            self = .implicitlyUnwrappedOptional
+        } else if typeDescription.hasPrefix("Optional<") {
+            self = .optional
+        } else {
+            self = .optional
+        }
+    }
+}
