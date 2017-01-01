@@ -20,6 +20,8 @@ public extension NilSafe {
             let result: Bool
 
             switch OptionalType(child.value) {
+            case .array(let value):
+                result = checkArray(value)
             case .optional:
                 result = checkOptionalValueOrSucceed(child.value)
             case .implicitlyUnwrappedOptional:
@@ -39,6 +41,16 @@ public extension NilSafe {
 }
 
 extension NilSafe {
+    fileprivate func checkArray(_ array: Array<Any>) -> Bool {
+        return array.reduce(true) { acc, child -> Bool in
+            if let nilSafeChild = child as? NilSafe {
+                return acc && nilSafeChild.isNilSafe()
+            } else {
+                return acc && true
+            }
+        }
+    }
+
     fileprivate func checkOptionalValueOrSucceed(_ childValue: Any) -> Bool {
         if let value = getValue(childValue), let nilSafeValue = value as? NilSafe {
             return nilSafeValue.isNilSafe()
@@ -49,6 +61,8 @@ extension NilSafe {
 
     fileprivate func getValue(_ value: Any) -> Any? {
         if let first = Mirror(reflecting: value).children.first {
+            print(first.value)
+            print(type(of: first.value))
             return first.value
         } else {
             return nil
@@ -60,14 +74,17 @@ extension NilSafe {
     }
 }
 
-fileprivate enum OptionalType {
+enum OptionalType {
     case implicitlyUnwrappedOptional
     case optional
+    case array([Any])
     case other
 
     init(_ value: Any) {
         let typeDescription = "\(type(of: value))"
-        if typeDescription.hasPrefix("ImplicitlyUnwrappedOptional<") {
+        if let array = value as? Array<Any> {
+            self = .array(array)
+        } else if typeDescription.hasPrefix("ImplicitlyUnwrappedOptional<") {
             self = .implicitlyUnwrappedOptional
         } else if typeDescription.hasPrefix("Optional<") {
             self = .optional

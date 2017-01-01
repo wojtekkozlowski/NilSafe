@@ -158,4 +158,56 @@ class NilSafeTests: XCTestCase {
 
         XCTAssertFalse(user.isNilSafe())
     }
+
+    func testArrayValid_1() {
+
+        class B: NilSafe {
+            var c: String!
+        }
+
+        class A: NilSafe {
+            var bs: [B]!
+        }
+
+        let a = A()
+        let b = B()
+        b.c = "required"
+        a.bs = [b]
+
+        XCTAssertTrue(a.isNilSafe())
+    }
+
+    func testArrayInValid_Array_Element_has_nil_property() {
+
+        class B: NilSafe { var c: String! }
+        class A: NilSafe { var bs: [B]! }
+
+        let a = A()
+        let b = B()
+        //        b.c = "required"
+        a.bs = [b]
+
+        XCTAssertFalse(a.isNilSafe())
+    }
+
+    func testArrayValid_Optional() {
+
+        class B: NilSafe { var c: String! }
+        class A: NilSafe { var bs: [B]? }
+
+        let a = A()
+
+        XCTAssertTrue(a.isNilSafe())
+    }
+
+    func testArray_Optional_But_Element_has_nil_property() {
+
+        class B: NilSafe { var c: String! }
+        class A: NilSafe { var bs: [B]? }
+
+        let a = A()
+        a.bs = [B()]
+
+        XCTAssertFalse(a.isNilSafe())
+    }
 }
