@@ -177,7 +177,7 @@ class NilSafeTests: XCTestCase {
         XCTAssertTrue(a.isNilSafe())
     }
 
-    func testArrayInValid_Array_Element_has_nil_property() {
+    func testArrayInvalid_Array_Element_has_nil_property() {
 
         class B: NilSafe { var c: String! }
         class A: NilSafe { var bs: [B]! }
@@ -189,6 +189,19 @@ class NilSafeTests: XCTestCase {
 
         XCTAssertFalse(a.isNilSafe())
     }
+    
+    func testArrayValid_empty_array() {
+        
+        class B: NilSafe { var c: String! }
+        class A: NilSafe { var bs: [B]! }
+        
+        let a = A()
+        a.bs = []
+        
+        XCTAssertTrue(a.isNilSafe())
+    }
+    
+    
 
     func testArrayValid_Optional() {
 
