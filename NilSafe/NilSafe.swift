@@ -60,7 +60,7 @@ fileprivate func hasValue(_ value: Any) -> Bool {
     return getValue(value) != nil
 }
 
-enum OptionalType {
+fileprivate enum OptionalType {
     case implicitlyUnwrappedOptional
     case optional
     case array([Any])
