@@ -9,15 +9,6 @@
 import XCTest
 @testable import NilSafe
 
-protocol Mappable {
-    func map()
-}
-
-class Model: Mappable {
-    func map() {
-    }
-}
-
 class User {
     var name: String!
     var account: Account!
