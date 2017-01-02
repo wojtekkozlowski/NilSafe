@@ -9,9 +9,14 @@
 import XCTest
 @testable import NilSafe
 
-extension User: NilSafe {}
-extension Account: NilSafe {}
-extension Discount: NilSafe {}
+protocol Mappable {
+    func map()
+}
+
+class Model: Mappable {
+    func map() {
+    }
+}
 
 class User {
     var name: String!
@@ -37,6 +42,7 @@ enum AccountType {
 class NilSafeTests: XCTestCase {
 
     func testValid() {
+
         let discount = Discount()
         discount.amount = 5
         discount.text = "Hello"
@@ -50,7 +56,7 @@ class NilSafeTests: XCTestCase {
         user.name = "joe"
         user.account = account
 
-        XCTAssertTrue(user.isNilSafe())
+        XCTAssertTrue(isNilSafe(user))
     }
 
     func testInvalid_User_1() {
@@ -68,7 +74,7 @@ class NilSafeTests: XCTestCase {
         //        user.name = "joe"
         user.account = account
 
-        XCTAssertFalse(user.isNilSafe())
+        XCTAssertFalse(isNilSafe(user))
     }
 
     func testInvalid_User_2() {
@@ -86,7 +92,7 @@ class NilSafeTests: XCTestCase {
         user.name = "joe"
         //        user.account = account
 
-        XCTAssertFalse(user.isNilSafe())
+        XCTAssertFalse(isNilSafe(user))
     }
 
     func testInvalid_User_Account_1() {
@@ -104,7 +110,7 @@ class NilSafeTests: XCTestCase {
         user.name = "joe"
         user.account = account
 
-        XCTAssertFalse(user.isNilSafe())
+        XCTAssertFalse(isNilSafe(user))
     }
 
     func testInvalid_User_Account_2() {
@@ -122,7 +128,7 @@ class NilSafeTests: XCTestCase {
         user.name = "joe"
         user.account = account
 
-        XCTAssertFalse(user.isNilSafe())
+        XCTAssertFalse(isNilSafe(user))
     }
 
     func testInvalid_User_Account_Discounts_text() {
@@ -139,7 +145,7 @@ class NilSafeTests: XCTestCase {
         user.name = "joe"
         user.account = account
 
-        XCTAssertFalse(user.isNilSafe())
+        XCTAssertFalse(isNilSafe(user))
     }
 
     func testInvalid_User_Account_Discounts_Amount() {
@@ -156,16 +162,16 @@ class NilSafeTests: XCTestCase {
         user.name = "joe"
         user.account = account
 
-        XCTAssertFalse(user.isNilSafe())
+        XCTAssertFalse(isNilSafe(user))
     }
 
     func testArrayValid() {
 
-        class B: NilSafe {
+        class B {
             var c: String!
         }
 
-        class A: NilSafe {
+        class A {
             var bs: [B]!
         }
 
@@ -174,73 +180,73 @@ class NilSafeTests: XCTestCase {
         b.c = "required"
         a.bs = [b]
 
-        XCTAssertTrue(a.isNilSafe())
+        XCTAssertTrue(isNilSafe(a))
     }
 
     func testArrayInvalid_Array_Element_has_nil_property() {
 
-        class B: NilSafe { var c: String! }
-        class A: NilSafe { var bs: [B]! }
+        class B { var c: String! }
+        class A { var bs: [B]! }
 
         let a = A()
         let b = B()
         //        b.c = "required"
         a.bs = [b]
 
-        XCTAssertFalse(a.isNilSafe())
+        XCTAssertFalse(isNilSafe(a))
     }
 
     func testArrayValid_empty_array() {
 
-        class B: NilSafe { var c: String! }
-        class A: NilSafe { var bs: [B]! }
+        class B { var c: String! }
+        class A { var bs: [B]! }
 
         let a = A()
         a.bs = []
 
-        XCTAssertTrue(a.isNilSafe())
+        XCTAssertTrue(isNilSafe(a))
     }
 
     func testArrayValid_Optional() {
 
-        class B: NilSafe { var c: String! }
-        class A: NilSafe { var bs: [B]? }
+        class B { var c: String! }
+        class A { var bs: [B]? }
 
         let a = A()
 
-        XCTAssertTrue(a.isNilSafe())
+        XCTAssertTrue(isNilSafe(a))
     }
 
     func testArray_Optional_But_Element_has_nil_property() {
 
-        class B: NilSafe { var c: String! }
-        class A: NilSafe { var bs: [B]? }
+        class B { var c: String! }
+        class A { var bs: [B]? }
 
         let a = A()
         a.bs = [B()]
 
-        XCTAssertFalse(a.isNilSafe())
+        XCTAssertFalse(isNilSafe(a))
     }
 
     func testArray_Optional_But_Nasted_Element_has_nil_property() {
 
-        class C: NilSafe { var c: String! }
-        class B: NilSafe { var cs: [C]! }
-        class A: NilSafe { var bs: [B]? }
+        class C { var c: String! }
+        class B { var cs: [C]! }
+        class A { var bs: [B]? }
 
         let a = A()
         let b = B()
         b.cs = [C()]
         a.bs = [b]
 
-        XCTAssertFalse(a.isNilSafe())
+        XCTAssertFalse(isNilSafe(a))
     }
 
     func testArray_Optional_Nasted_Elements() {
 
-        class C: NilSafe { var str: String! }
-        class B: NilSafe { var cs: [C]! }
-        class A: NilSafe { var bs: [B]? }
+        class C { var str: String! }
+        class B { var cs: [C]! }
+        class A { var bs: [B]? }
 
         let a = A()
         let b = B()
@@ -249,6 +255,6 @@ class NilSafeTests: XCTestCase {
         b.cs = [c]
         a.bs = [b]
 
-        XCTAssertTrue(a.isNilSafe())
+        XCTAssertTrue(isNilSafe(a))
     }
 }
