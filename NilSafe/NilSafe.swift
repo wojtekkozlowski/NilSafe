@@ -23,7 +23,7 @@ public func isNilSafe(_ some: Any) -> Bool {
             if hasValue(child.value) {
                 result = checkOptionalValueOrSucceed(child.value)
             } else {
-                NSLog("NilSafe error: property '\(some).\(child.label!)' cannot be nil")
+                NSLog("💥 NilSafe error: property '\(some).\(child.label!)' cannot be nil")
                 result = false
             }
         case .other:
